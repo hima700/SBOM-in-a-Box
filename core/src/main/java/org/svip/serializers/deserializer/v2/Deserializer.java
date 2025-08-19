@@ -38,9 +38,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <b>File:</b> Serializer.java
+ * <b>File:</b> Deserializer.java
  * <p>
- * <b>Description:</b> Generic serializer that loads JSON and XML files into hashmaps to be used by schema implementations
+ * <b>Description:</b> Generic deserializer that loads JSON and XML files into hashmaps to be used by schema implementations
  *
  * @author Derek Garcia
  */
