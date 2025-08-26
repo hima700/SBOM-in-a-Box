@@ -40,6 +40,9 @@ import org.svip.sbom.model.shared.util.Description;
 import org.svip.sbom.model.shared.util.ExternalReference;
 import org.svip.sbom.model.shared.util.LicenseCollection;
 import org.svip.serializers.FileFormat;
+import org.svip.serializers.Schema;
+import org.svip.serializers.exceptions.DeserializerException;
+import org.svip.serializers.exceptions.UnsupportedFileFormatException;
 
 import java.io.File;
 import java.util.HashMap;
@@ -64,18 +67,22 @@ public class SPDX23Deserializer extends Deserializer {
 
     /// Patterns
 
-    private static final Pattern CREATOR_PATTERN = Pattern.compile(
-            "^(?:(Person|Organization): )(.+?)(?:$| (?:\\((.*)\\))?$)");
-    private static final Pattern TOOL_PATTERN = Pattern.compile("^Tool: (?:(.*)-)(.*)$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern CREATOR_PATTERN = Pattern.compile("^(Person|Organization): (.+?)(?:$| (?:\\((.*)\\))?$)");
+    private static final Pattern TOOL_PATTERN = Pattern.compile("^Tool: (.*)-(.*)$", Pattern.CASE_INSENSITIVE);
 
 
     /**
      * Create new deserializer
      *
      * @param fileFormat Type of deserializer
+     * @throws UnsupportedFileFormatException if attempt to deserialize from an unsupported format
      */
     public SPDX23Deserializer(FileFormat fileFormat) {
         super(fileFormat);
+        // check for unsupported file formats
+        if(fileFormat != FileFormat.JSON && fileFormat != FileFormat.TAG_VALUE) {
+            throw new UnsupportedFileFormatException(Schema.SPDX_23, fileFormat);
+        }
     }
 
 
@@ -369,5 +376,12 @@ public class SPDX23Deserializer extends Deserializer {
         // Build the SBOM
         return sbomBuilder.buildSPDX23SBOM();
 
+    }
+
+
+    public static void main(String[] args) throws DeserializerException {
+        String f = "/home/derek/Work/SBOM-in-a-Box/core/src/test/resources/serializers/spdx_tagvalue/demo.spdx";
+        var d = new SPDX23Deserializer(FileFormat.TAG_VALUE).deserialize(new File(f));
+        System.out.println(d);
     }
 }

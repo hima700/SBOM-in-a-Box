@@ -38,6 +38,9 @@ import org.svip.sbom.model.shared.util.Description;
 import org.svip.sbom.model.shared.util.ExternalReference;
 import org.svip.sbom.model.shared.util.LicenseCollection;
 import org.svip.serializers.FileFormat;
+import org.svip.serializers.Schema;
+import org.svip.serializers.exceptions.DeserializerException;
+import org.svip.serializers.exceptions.UnsupportedFileFormatException;
 
 import java.io.File;
 import java.util.*;
@@ -57,9 +60,13 @@ public class CDX14Deserializer extends Deserializer {
      * Create new CycloneDX 1.4 deserializer
      *
      * @param fileFormat Type of deserializer
+     * @throws UnsupportedFileFormatException if attempt to deserialize from an unsupported format
      */
     public CDX14Deserializer(FileFormat fileFormat) {
         super(fileFormat);
+        if(fileFormat != FileFormat.JSON && fileFormat != FileFormat.XML) {
+            throw new UnsupportedFileFormatException(Schema.CycloneDX_14, fileFormat);
+        }
     }
 
     /**
@@ -383,9 +390,6 @@ public class CDX14Deserializer extends Deserializer {
      */
     @Override
     public CDX14SBOM deserialize(File file) throws DeserializerException {
-        // cdx doesn't support tag-value
-        if (fileFormat == FileFormat.TAG_VALUE)
-            throw new DeserializerException("CycloneDX 1.4 does not support Tag-Value", file, fileFormat);
         // load into map
         Map<String, Object> content = super.loadFile(file);
 
